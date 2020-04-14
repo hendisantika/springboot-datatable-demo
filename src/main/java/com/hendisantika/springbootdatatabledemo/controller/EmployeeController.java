@@ -5,6 +5,8 @@ import com.hendisantika.springbootdatatabledemo.repository.EmployeeRepository;
 import org.springframework.data.jpa.datatables.mapping.DataTablesInput;
 import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -28,6 +30,11 @@ public class EmployeeController {
 
     @GetMapping(value = "/employees")
     public DataTablesOutput<Employee> list(@Valid DataTablesInput input) {
+        return employeeRepository.findAll(input);
+    }
+
+    @PostMapping(value = "/employees")
+    public DataTablesOutput<Employee> listPOST(@Valid @RequestBody DataTablesInput input) {
         return employeeRepository.findAll(input);
     }
 }

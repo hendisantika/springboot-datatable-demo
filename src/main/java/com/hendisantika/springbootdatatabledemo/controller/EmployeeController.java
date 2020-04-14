@@ -37,4 +37,9 @@ public class EmployeeController {
     public DataTablesOutput<Employee> listPOST(@Valid @RequestBody DataTablesInput input) {
         return employeeRepository.findAll(input);
     }
+
+    @GetMapping(value = "/employees-advanced")
+    public DataTablesOutput<Employee> listAdvanced(@Valid DataTablesInput input) {
+        return employeeRepository.findAll(input, new SalarySpecification(input), new ExcludeAnalystsSpecification());
+    }
 }

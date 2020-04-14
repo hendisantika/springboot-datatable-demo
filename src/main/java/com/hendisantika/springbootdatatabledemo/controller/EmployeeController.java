@@ -46,7 +46,7 @@ public class EmployeeController {
         return employeeRepository.findAll(input);
     }
 
-    @GetMapping(value = "/advanced")
+    @GetMapping(value = "advanced")
     public DataTablesOutput<Employee> listAdvanced(@Valid DataTablesInput input) {
         return employeeRepository.findAll(input, new SalarySpecification(input), new ExcludeAnalystsSpecification());
     }

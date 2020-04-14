@@ -1,7 +1,13 @@
 package com.hendisantika.springbootdatatabledemo.controller;
 
+import com.hendisantika.springbootdatatabledemo.entity.Employee;
 import com.hendisantika.springbootdatatabledemo.repository.EmployeeRepository;
+import org.springframework.data.jpa.datatables.mapping.DataTablesInput;
+import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
 
 /**
  * Created by IntelliJ IDEA.
@@ -18,5 +24,10 @@ public class EmployeeController {
 
     public EmployeeController(EmployeeRepository employeeRepository) {
         this.employeeRepository = employeeRepository;
+    }
+
+    @GetMapping(value = "/employees")
+    public DataTablesOutput<Employee> list(@Valid DataTablesInput input) {
+        return employeeRepository.findAll(input);
     }
 }

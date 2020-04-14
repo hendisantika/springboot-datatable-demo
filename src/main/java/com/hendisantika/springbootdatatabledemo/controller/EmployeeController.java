@@ -1,16 +1,21 @@
 package com.hendisantika.springbootdatatabledemo.controller;
 
 import com.hendisantika.springbootdatatabledemo.entity.Employee;
+import com.hendisantika.springbootdatatabledemo.init.SalarySpecification;
 import com.hendisantika.springbootdatatabledemo.repository.EmployeeRepository;
 import org.springframework.data.jpa.datatables.mapping.DataTablesInput;
 import org.springframework.data.jpa.datatables.mapping.DataTablesOutput;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import javax.validation.Valid;
 
 /**
@@ -23,6 +28,7 @@ import javax.validation.Valid;
  * Time: 06.25
  */
 @RestController
+@RequestMapping(value = "/employees")
 public class EmployeeController {
     private final EmployeeRepository employeeRepository;
 
@@ -30,44 +36,27 @@ public class EmployeeController {
         this.employeeRepository = employeeRepository;
     }
 
-    @GetMapping(value = "/employees")
+    @GetMapping
     public DataTablesOutput<Employee> list(@Valid DataTablesInput input) {
         return employeeRepository.findAll(input);
     }
 
-    @PostMapping(value = "/employees")
+    @PostMapping
     public DataTablesOutput<Employee> listPOST(@Valid @RequestBody DataTablesInput input) {
         return employeeRepository.findAll(input);
     }
 
-    @GetMapping(value = "/employees-advanced")
+    @GetMapping(value = "/advanced")
     public DataTablesOutput<Employee> listAdvanced(@Valid DataTablesInput input) {
         return employeeRepository.findAll(input, new SalarySpecification(input), new ExcludeAnalystsSpecification());
     }
 
-    private class SalarySpecification implements Specification<Employee> {
-        private final Integer minSalary;
-        private final Integer maxSalary;
-
-        SalarySpecification(DataTablesInput input) {
-            String salaryFilter = input.getColumn("salary").getSearch().getValue();
-            if (!StringUtils.hasText(salaryFilter)) {
-                minSalary = maxSalary = null;
-                return;
-            }
-            String[] bounds = salaryFilter.split(";");
-            minSalary = getValue(bounds, 0);
-            maxSalary = getValue(bounds, 1);
-        }
-
-        private Integer getValue(String[] bounds, int index) {
-            if (bounds.length > index && StringUtils.hasText(bounds[index])) {
-                try {
-                    return Integer.valueOf(bounds[index]);
-                } catch (NumberFormatException e) {
-                    return null;
-                }
-            }
-            return null;
+    private class ExcludeAnalystsSpecification implements Specification<Employee> {
+        @Override
+        public Predicate toPredicate(Root<Employee> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+            return criteriaBuilder.notEqual(root.get("position"), "Analyst");
         }
     }
+
+
+}
